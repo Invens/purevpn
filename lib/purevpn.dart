@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-class VpnPlugin {
+class PureVpn {
   static const MethodChannel _channel = MethodChannel('vpn_plugin_channel');
 
   /// Sets the Atom SDK secret key.

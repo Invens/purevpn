@@ -27,7 +27,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class VpnPlugin implements FlutterPlugin, MethodChannel.MethodCallHandler {
+public class PureVpn implements FlutterPlugin, MethodChannel.MethodCallHandler {
 
   private MethodChannel channel;
   private Context context;

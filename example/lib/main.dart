@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:purevpn/purevpn.dart'; // Replace with your actual plugin name
+import 'package:purevpn/purevpn.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,135 +9,62 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'VPN Plugin Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: VpnExamplePage(),
+      home: VpnDemo(),
     );
   }
 }
 
-class VpnExamplePage extends StatefulWidget {
+class VpnDemo extends StatefulWidget {
   @override
-  _VpnExamplePageState createState() => _VpnExamplePageState();
+  _VpnDemoState createState() => _VpnDemoState();
 }
 
-class _VpnExamplePageState extends State<VpnExamplePage> {
-  final VpnPlugin _vpnPlugin = VpnPlugin();
-
-  String _status = 'Disconnected';
-  List<String> _servers = [];
-  String _selectedServer = '';
-  String _secretKey = 'your_secret_key_here'; // Replace with your Secret Key
-  String _accessToken =
-      'your_access_token_here'; // Replace with your Access Token
-  String _vpnUsername = 'your_username_here'; // Replace with your VPN Username
-  String _vpnPassword = 'your_password_here'; // Replace with your VPN Password
-
+class _VpnDemoState extends State<VpnDemo> {
   @override
   void initState() {
     super.initState();
-    _initializeVpn();
+    initPlugin();
   }
 
-  Future<void> _initializeVpn() async {
+  Future<void> initPlugin() async {
     try {
-      await _vpnPlugin.setSecretKey(secretKey: _secretKey);
-      _fetchServers();
+      await PureVpn.setSecretKey("your_secret_key");
+      await PureVpn.setAccessToken("your_access_token");
+      print("Plugin Initialized");
     } catch (e) {
-      print('Error initializing VPN: $e');
+      print("Initialization error: $e");
     }
   }
 
-  Future<void> _fetchServers() async {
+  Future<void> connectVpn() async {
     try {
-      final servers = await _vpnPlugin.fetchServers(_accessToken);
-      setState(() {
-        _servers = servers.map((server) => server['name']).toList();
-        if (_servers.isNotEmpty) {
-          _selectedServer = _servers[0];
-        }
-      });
+      await PureVpn.connectVPN("US", "UDP");
+      print("VPN connected");
     } catch (e) {
-      print('Error fetching servers: $e');
+      print("Connection error: $e");
     }
   }
 
-  Future<void> _connectVpn() async {
+  Future<void> disconnectVpn() async {
     try {
-      setState(() {
-        _status = 'Connecting...';
-      });
-      await _vpnPlugin.connectVpn(
-        username: _vpnUsername,
-        password: _vpnPassword,
-        server: _selectedServer,
-      );
-      setState(() {
-        _status = 'Connected';
-      });
+      await PureVpn.disconnectVPN();
+      print("VPN disconnected");
     } catch (e) {
-      setState(() {
-        _status = 'Connection Failed';
-      });
-      print('Error connecting VPN: $e');
-    }
-  }
-
-  Future<void> _disconnectVpn() async {
-    try {
-      await _vpnPlugin.disconnectVpn();
-      setState(() {
-        _status = 'Disconnected';
-      });
-    } catch (e) {
-      print('Error disconnecting VPN: $e');
+      print("Disconnection error: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('VPN Plugin Example'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(title: Text("VPN Plugin Demo")),
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('VPN Status: $_status', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 16),
-            if (_servers.isNotEmpty)
-              DropdownButton<String>(
-                value: _selectedServer,
-                items: _servers
-                    .map((server) => DropdownMenuItem(
-                          value: server,
-                          child: Text(server),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedServer = value!;
-                  });
-                },
-              ),
-            SizedBox(height: 16),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: _connectVpn,
-                  child: Text('Connect VPN'),
-                ),
-                SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: _disconnectVpn,
-                  child: Text('Disconnect VPN'),
-                ),
-              ],
-            ),
+            ElevatedButton(onPressed: connectVpn, child: Text("Connect VPN")),
+            ElevatedButton(
+                onPressed: disconnectVpn, child: Text("Disconnect VPN")),
           ],
         ),
       ),
