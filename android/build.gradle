@@ -1,0 +1,73 @@
+group = "com.appmontizesg.purevpn"
+version = "1.0"
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        maven { url "https://bitbucket.org/purevpn/atom-android-releases/raw/master" }
+    }
+
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.1.0")
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io'
+            credentials { username authToken }
+        }
+        maven { url "https://bitbucket.org/purevpn/atom-android-releases/raw/master" }
+    }
+}
+
+apply plugin: "com.android.library"
+
+android {
+    if (project.android.hasProperty("namespace")) {
+        namespace = "com.appmontizesg.purevpn"
+    }
+
+    compileSdk = 34
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        minSdk = 21
+    }
+
+    dependencies {
+        implementation 'org.bitbucket.purevpn:purevpn-sdk-android:5.0.4' // Add Atom SDK dependency
+
+        testImplementation("junit:junit:4.13.2")
+        testImplementation("org.mockito:mockito-core:5.0.0")
+    }
+
+    testOptions {
+        unitTests.all {
+            testLogging {
+                events "passed", "skipped", "failed", "standardOut", "standardError"
+                outputs.upToDateWhen { false }
+                showStandardStreams = true
+            }
+        }
+    }
+
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true // Required for Atom SDK
+        }
+    }
+}
+
+dependencies {
+    // Add the Atom SDK dependency here
+    implementation 'org.bitbucket.purevpn:purevpn-sdk-android:5.0.4'
+}
